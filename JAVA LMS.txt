@@ -1,0 +1,157 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class LibraryManagementSystem {
+    static final int MAX_BOOKS = 100;
+    static Book[] library = new Book[MAX_BOOKS];
+    static int bookCount = 0;
+
+    static class Book {
+        int id;
+        String title;
+        String author;
+        boolean isIssued;
+
+        Book(int id, String title, String author) {
+            this.id = id;
+            this.title = title;
+            this.author = author;
+            this.isIssued = false;
+        }
+    }
+
+    static void addBook(int id, String title, String author) {
+        if (bookCount >= MAX_BOOKS) {
+            System.out.println("Library is full, cannot add more books.");
+            return;
+        }
+        library[bookCount++] = new Book(id, title, author);
+        System.out.println("Book added: " + title + " by " + author);
+    }
+
+    static void searchBook(String title) {
+        boolean found = false;
+        for (int i = 0; i < bookCount; i++) {
+            if (library[i].title.equalsIgnoreCase(title)) {
+                System.out.println("Book found: " + library[i].id + " " + library[i].title + " by " + library[i].author +
+                        (library[i].isIssued ? " (Issued)" : " (Available)"));
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("Book not found");
+        }
+    }
+
+    static void issueBook(int id) {
+        for (int i = 0; i < bookCount; i++) {
+            if (library[i].id == id) {
+                if (!library[i].isIssued) {
+                    library[i].isIssued = true;
+                    System.out.println("Book issued: " + library[i].title);
+                } else {
+                    System.out.println("Book already issued");
+                }
+                return;
+            }
+        }
+        System.out.println("Book not found");
+    }
+
+    static void returnBook(int id) {
+        for (int i = 0; i < bookCount; i++) {
+            if (library[i].id == id) {
+                if (library[i].isIssued) {
+                    library[i].isIssued = false;
+                    System.out.println("Book returned: " + library[i].title);
+                } else {
+                    System.out.println("Book was not issued");
+                }
+                return;
+            }
+        }
+        System.out.println("Book not found");
+    }
+
+    static void listBooks() {
+        Arrays.sort(library, 0, bookCount, (a, b) -> a.title.compareTo(b.title));
+        for (int i = 0; i < bookCount; i++) {
+            System.out.println(library[i].id + " " + library[i].title + " by " + library[i].author +
+                    (library[i].isIssued ? " (Issued)" : " (Available)"));
+        }
+    }
+
+    static void deleteBook(int id) {
+        for (int i = 0; i < bookCount; i++) {
+            if (library[i].id == id) {
+                System.arraycopy(library, i + 1, library, i, bookCount - i - 1);
+                bookCount--;
+                System.out.println("Book deleted");
+                return;
+            }
+        }
+        System.out.println("Book not found");
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String command;
+        int id;
+        String title, author;
+
+        while (true) {
+            System.out.println("\nLibrary Management System");
+            System.out.print("Enter a command (ADD, SEARCH, ISSUE, RETURN, LIST, DELETE, EXIT): ");
+            command = scanner.nextLine().toUpperCase();
+
+            switch (command) {
+                case "ADD":
+                    System.out.print("Enter book ID: ");
+                    id = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline left-over
+                    System.out.print("Enter book title: ");
+                    title = scanner.nextLine();
+                    System.out.print("Enter book author: ");
+                    author = scanner.nextLine();
+                    addBook(id, title, author);
+                    break;
+
+                case "SEARCH":
+                    System.out.print("Enter book title to search: ");
+                    title = scanner.nextLine();
+                    searchBook(title);
+                    break;
+
+                case "ISSUE":
+                    System.out.print("Enter book ID to issue: ");
+                    id = scanner.nextInt();
+                    issueBook(id);
+                    break;
+
+                case "RETURN":
+                    System.out.print("Enter book ID to return: ");
+                    id = scanner.nextInt();
+                    returnBook(id);
+                    break;
+
+                case "LIST":
+                    listBooks();
+                    break;
+
+                case "DELETE":
+                    System.out.print("Enter book ID to delete: ");
+                    id = scanner.nextInt();
+                    deleteBook(id);
+                    break;
+
+                case "EXIT":
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid command, please try again.");
+            }
+        }
+    }
+}

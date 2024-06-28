@@ -1,0 +1,167 @@
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <cctype>// for case conversion and character classification
+
+using namespace std;
+
+const int MAX_BOOKS = 100; // Maximum number of books in the library
+
+struct Book {
+    int id;
+    string title;
+    string author;
+    bool isIssued;
+
+    Book() : id(0), title(""), author(""), isIssued(false) {} // Default constructor
+};
+
+Book library[MAX_BOOKS]; // Array to store books
+int bookCount = 0; // Current number of books in the library
+
+// Add a new book to the library
+void addBook(int id, string title, string author) {
+    if (bookCount >= MAX_BOOKS) {
+        cout << "Library is full, cannot add more books." << endl;
+        return;
+    }
+    library[bookCount].id = id;
+    library[bookCount].title = title;
+    library[bookCount].author = author;
+    library[bookCount].isIssued = false;
+    bookCount++;
+}
+
+// Search for a book by title or ID
+void searchBook(string title = "", int id = -1) {
+    for (int i = 0; i < bookCount; ++i) {
+        if (library[i].title == title || library[i].id == id) {
+            cout << "Book found: " << library[i].id << " " << library[i].title << " by " << library[i].author 
+                 << (library[i].isIssued ? " (Issued)" : " (Available)") << endl;
+            return;
+        }
+    }
+    cout << "Book not found" << endl;
+}
+
+// Issue a book
+void issueBook(int id) {
+    for (int i = 0; i < bookCount; ++i) {
+        if (library[i].id == id) {
+            if (!library[i].isIssued) {
+                library[i].isIssued = true;
+                cout << "Book issued: " << library[i].title << endl;
+            } else {
+                cout << "Book already issued" << endl;
+            }
+            return;
+        }
+    }
+    cout << "Book not found" << endl;
+    
+}
+
+// Return a book
+void returnBook(int id) {
+    for (int i = 0; i < bookCount; ++i) {
+        if (library[i].id == id) {
+            if (library[i].isIssued) {
+                library[i].isIssued = false;
+                cout << "Book returned: " << library[i].title << endl;
+            } else {
+                cout << "Book was not issued" << endl;
+            }
+            return;
+        }
+    }
+    cout << "Book not found" << endl;
+}
+
+// List all books in the library
+void listBooks() {
+    // Sort books by title
+    sort(library, library + bookCount, [](const Book &a, const Book &b) {
+        return a.title < b.title;
+    });
+
+    for (int i = 0; i < bookCount; ++i) {
+        cout << library[i].id << " " << library[i].title << " by " << library[i].author 
+             << (library[i].isIssued ? " (Issued)" : " (Available)") << endl;
+    }
+}
+
+// Delete a book from the library
+void deleteBook(int id) {
+    for (int i = 0; i < bookCount; ++i) {
+        if (library[i].id == id) {
+            for (int j = i; j < bookCount - 1; ++j) {
+                library[j] = library[j + 1]; // Shift books to the left
+            }
+            --bookCount;
+            cout << "Book deleted" << endl;
+            return;
+        }
+    }
+    cout << "Book not found" << endl;
+}
+
+int main() {
+    string command;
+    int id;
+    string title, author;
+
+    while (true) {
+        cout << "\nLibrary Management System\n";
+        cout << "Enter a command (ADD, SEARCH, ISSUE, RETURN, LIST, DELETE, EXIT): ";
+        cin >> command;
+        transform(command.begin(), command.end(), command.begin(), ::toupper); // Convert command to uppercase
+
+        if (command == "ADD") {
+            cout << "Enter book ID: ";
+            cin >> id;
+            cin.ignore(); // Ignore the newline character left in the input buffer
+            cout << "Enter book title: ";
+            getline(cin, title);
+            cout << "Enter book author: ";
+            getline(cin, author);
+            addBook(id, title, author);
+
+        } else if (command == "SEARCH") {
+            cout << "Enter book title or ID to search (leave title blank to search by ID): ";
+            cin.ignore(); // Ignore the newline character left in the input buffer
+            getline(cin, title);
+            if (title.empty()) {
+                cout << "Enter book ID: ";
+                cin >> id;
+            }
+            searchBook(title, title.empty() ? id : -1);
+
+        } else if (command == "ISSUE") {
+            cout << "Enter book ID to issue: ";
+            cin >> id;
+            issueBook(id);
+
+        } else if (command == "RETURN") {
+            cout << "Enter book ID to return: ";
+            cin >> id;
+            returnBook(id);
+
+        } else if (command == "LIST") {
+            listBooks();
+
+        } else if (command == "DELETE") {
+            cout << "Enter book ID to delete: ";
+            cin >> id;
+            deleteBook(id);
+
+        } else if (command == "EXIT") {
+            cout << "Exiting..." << endl;
+            break;
+
+        } else {
+            cout << "Invalid command, please try again." << endl;
+        }
+    }
+
+    return 0;
+}

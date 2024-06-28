@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations - Library Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Add or access any book here!</h1>
+        <button class="button" onclick="openIndexPage()">Back to Home</button>
+        
+        <!-- Operation buttons -->
+        <div>
+            <button onclick="openAddBookForm()">Add Book</button>
+            <button onclick="openSearchBookForm()">Search Book</button>
+            <button onclick="openListBooks()">List Books</button>
+            <button onclick="openDeleteBookForm()">Delete Book</button>
+            <button onclick="openIssueBookForm()">Issue Book</button>
+            <button onclick="openReturnBookForm()">Return Book</button>
+        </div>
+
+        <!-- Output container -->
+        <div id="output"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
