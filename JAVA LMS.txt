@@ -11,22 +11,26 @@ public class LibraryManagementSystem {
         String title;
         String author;
         boolean isIssued;
+        boolean isDefault;
 
-        Book(int id, String title, String author) {
+        Book(int id, String title, String author, boolean isDefault) {
             this.id = id;
             this.title = title;
             this.author = author;
             this.isIssued = false;
+            this.isDefault = isDefault;
         }
     }
 
-    static void addBook(int id, String title, String author) {
+    static void addBook(int id, String title, String author, boolean isDefault) {
         if (bookCount >= MAX_BOOKS) {
             System.out.println("Library is full, cannot add more books.");
             return;
         }
-        library[bookCount++] = new Book(id, title, author);
-        System.out.println("Book added: " + title + " by " + author);
+        library[bookCount++] = new Book(id, title, author, isDefault);
+        if (!isDefault) {
+            System.out.println("Book added: " + title + " by " + author);
+        }
     }
 
     static void searchBook(String title) {
@@ -74,10 +78,15 @@ public class LibraryManagementSystem {
     }
 
     static void listBooks() {
-        Arrays.sort(library, 0, bookCount, (a, b) -> a.title.compareTo(b.title));
+        Arrays.sort(library, 0, bookCount, (a, b) -> Integer.compare(a.id, b.id));
+        boolean foundBooks = false;
         for (int i = 0; i < bookCount; i++) {
             System.out.println(library[i].id + " " + library[i].title + " by " + library[i].author +
                     (library[i].isIssued ? " (Issued)" : " (Available)"));
+            foundBooks = true;
+        }
+        if (!foundBooks) {
+            System.out.println("No books found.");
         }
     }
 
@@ -93,27 +102,64 @@ public class LibraryManagementSystem {
         System.out.println("Book not found");
     }
 
+    static void initializeLibrary() {
+        addBook(1, "To Kill a Mockingbird", "Harper Lee", true);
+        addBook(2, "1984", "George Orwell", true);
+        addBook(3, "Pride and Prejudice", "Jane Austen", true);
+        addBook(4, "The Great Gatsby", "F. Scott Fitzgerald", true);
+        addBook(5, "Moby-Dick", "Herman Melville", true);
+        addBook(6, "War and Peace", "Leo Tolstoy", true);
+        addBook(7, "The Catcher in the Rye", "J.D. Salinger", true);
+        addBook(8, "The Hobbit", "J.R.R. Tolkien", true);
+        addBook(9, "The Lord of the Rings", "J.R.R. Tolkien", true);
+        addBook(10, "Crime and Punishment", "Fyodor Dostoevsky", true);
+        addBook(11, "The Alchemist", "Paulo Coelho", true);
+        addBook(12, "Brave New World", "Aldous Huxley", true);
+        addBook(13, "Jane Eyre", "Charlotte Bronte", true);
+        addBook(14, "Wuthering Heights", "Emily Bronte", true);
+        addBook(15, "The Odyssey", "Homer", true);
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String command;
         int id;
         String title, author;
 
+        initializeLibrary(); // Initialize library with default books
+
+        System.out.println("*******************************************************************");
+        System.out.println("        WELCOME TO THE LIBRARY MANAGEMENT SYSTEM(LMS)   ");
+        System.out.println("*******************************************************************\n");
+
+        System.out.print(" Are you a librarian? (yes/no): ");
+        boolean isLibrarian = scanner.nextLine().equalsIgnoreCase("yes");
+        System.out.println();
+
         while (true) {
-            System.out.println("\nLibrary Management System");
-            System.out.print("Enter a command (ADD, SEARCH, ISSUE, RETURN, LIST, DELETE, EXIT): ");
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  LIBRARY MANAGEMENT SYSTEM  <<<<<<<<<<<<<<<<<<<");
+            if (isLibrarian) {
+                System.out.print("Enter a command (ADD, SEARCH, ISSUE, RETURN, LIST, DELETE, EXIT): ");
+            } else {
+                System.out.print("Enter a command (SEARCH, ISSUE, RETURN, LIST, EXIT): ");
+            }
             command = scanner.nextLine().toUpperCase();
+            System.out.println();
 
             switch (command) {
                 case "ADD":
-                    System.out.print("Enter book ID: ");
-                    id = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline left-over
-                    System.out.print("Enter book title: ");
-                    title = scanner.nextLine();
-                    System.out.print("Enter book author: ");
-                    author = scanner.nextLine();
-                    addBook(id, title, author);
+                    if (isLibrarian) {
+                        System.out.print("Enter book ID: ");
+                        id = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline left-over
+                        System.out.print("Enter book title: ");
+                        title = scanner.nextLine();
+                        System.out.print("Enter book author: ");
+                        author = scanner.nextLine();
+                        addBook(id, title, author, false);
+                    } else {
+                        System.out.println("Invalid command, please try again.");
+                    }
                     break;
 
                 case "SEARCH":
@@ -126,26 +172,40 @@ public class LibraryManagementSystem {
                     System.out.print("Enter book ID to issue: ");
                     id = scanner.nextInt();
                     issueBook(id);
+                    scanner.nextLine(); // Consume newline left-over
                     break;
 
                 case "RETURN":
                     System.out.print("Enter book ID to return: ");
                     id = scanner.nextInt();
                     returnBook(id);
+                    scanner.nextLine(); // Consume newline left-over
                     break;
 
                 case "LIST":
                     listBooks();
+                    System.out.println();
                     break;
 
                 case "DELETE":
-                    System.out.print("Enter book ID to delete: ");
-                    id = scanner.nextInt();
-                    deleteBook(id);
+                    if (isLibrarian) {
+                        System.out.print("Enter book ID to delete: ");
+                        id = scanner.nextInt();
+                        deleteBook(id);
+                        scanner.nextLine(); // Consume newline left-over
+                    } else {
+                        System.out.println("Invalid command, please try again.");
+                    }
                     break;
 
                 case "EXIT":
-                    System.out.println("Exiting...");
+                    System.out.println("\n exiting......\n\n");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(">>>>>>>>>>>>>>>> THANKYOU FOR USING OUR LIBRARY. GOOD LUCK! <<<<<<<<<<<<<<<<<<<<<");
                     scanner.close();
                     return;
 
